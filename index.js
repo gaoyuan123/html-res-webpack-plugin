@@ -167,6 +167,7 @@ HtmlResWebpackPlugin.prototype.injectAssets = function(compilation) {
 					scriptContent += (jsInline) ? 
 									('<script ' + jsAttr + ' >' + jsInline + '</script>')
 									: ('<script ' + jsAttr + ' type="text/javascript" src="' + srcPath + '"></script>\n');
+					jsInline && delete compilation.assets[file];
 					break;
 				case 'css':
 					let styleInline = false;
@@ -179,6 +180,7 @@ HtmlResWebpackPlugin.prototype.injectAssets = function(compilation) {
 					styleContent += (styleInline) ? 
 									('<style ' + styleAttr + '>' + styleInline + '</style>')
 									: ('<link ' + styleAttr + ' rel="stylesheet" href="' + hrefPath + '">\n');
+					styleInline && delete compilation.assets[file];
 					break;
 				case 'ico':
 					break;
