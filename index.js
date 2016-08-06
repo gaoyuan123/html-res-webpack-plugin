@@ -20,7 +20,9 @@ function HtmlResWebpackPlugin(options) {
 		chunks: options.chunks || [],
 		htmlMinify: options.htmlMinify || false,
 		favicon: options.favicon || false,
-		templateContent: options.templateContent || function(tpl) { return tpl }
+		templateContent: options.templateContent || function(tpl) { return tpl },
+		stylePlaceholder: options.stylePlaceholder || /<resource:style\s*\/>/ig,
+		scriptPlaceholder: options.scriptPlaceholder || /<resource:javascript\s*\/>/ig
 	}, options);
 
 	this.checkRequiredOptions(this.options);
@@ -194,7 +196,18 @@ HtmlResWebpackPlugin.prototype.injectAssets = function(compilation) {
     				      + '<link rel="icon" type="image/x-icon" href="' + publicPath + this.options.faviconFileName + '">\n'
 	}
 	// console.log(compilation.assets[this.options.htmlFileName].source());
-	htmlContent = htmlContent.replace("</head>", faviconContent + "</head>").replace("</head>", styleContent + "</head>").replace("</body>", scriptContent + "</body>");
+	htmlContent = htmlContent.replace("</head>", faviconContent + "</head>");//.replace("</head>", styleContent + "</head>").replace("</body>", scriptContent + "</body>");
+	if(this.options.stylePlaceholder.test(htmlContent)){
+		htmlContent = htmlContent.replace(this.options.stylePlaceholder,styleContent);
+	}else{
+		htmlContent = htmlContent.replace("</head>", styleContent + "</head>");
+	}
+	
+	if(this.options.scriptPlaceholder.test(htmlContent)){
+		htmlContent = htmlContent.replace(this.options.scriptPlaceholder,scriptContent);
+	}else{
+		htmlContent = htmlContent.replace("</body>", scriptContent + "</body>");
+	}
 	
 	let htmlAssetObj = compilation.assets[this.options.htmlFileName];
 	compilation.assets[this.options.htmlFileName] = _.merge(htmlAssetObj, {
